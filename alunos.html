@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Alunos</title>
+  <link rel="stylesheet" href="global.css" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>Cadastro de Alunos</h1>
+    <a href="dashboard.html">Voltar</a>
+  </div>
+
+  <div class="content">
+
+    <div class="card">
+      <h2>Novo Aluno</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" />
+        </div>
+        <div class="form-group">
+          <label>E-mail Institucional</label>
+          <input type="email" />
+        </div>
+        <div class="form-group">
+          <label>Matrícula</label>
+          <input type="text" />
+        </div>
+        <div class="form-group">
+          <label>Curso</label>
+          <select>
+            <option>Selecione o curso</option>
+            <option>Engenharia de Software</option>
+            <option>Ciência da Computação</option>
+            <option>Sistemas de Informação</option>
+            <option>Design Digital</option>
+          </select>
+        </div>
+      </div>
+      <button class="btn btn-primary">Cadastrar Aluno</button>
+    </div>
+
+    <div class="card">
+      <h2>Alunos Cadastrados</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Matrícula</th>
+              <th>Curso</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>João Silva</td>
+              <td>joao@email.com</td>
+              <td>20241001</td>
+              <td>Eng. Software</td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-primary">Editar</button>
+                  <button class="btn btn-secondary">Excluir</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Maria Santos</td>
+              <td>maria@email.com</td>
+              <td>20241002</td>
+              <td>Ciência Comp.</td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-primary">Editar</button>
+                  <button class="btn btn-secondary">Excluir</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>

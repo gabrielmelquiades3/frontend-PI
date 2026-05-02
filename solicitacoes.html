@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitações de Atividades</title>
+  <link rel="stylesheet" href="global.css" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>Solicitações de Atividades</h1>
+    <a href="dashboard.html">Voltar</a>
+  </div>
+
+  <div class="content">
+
+    <div class="filtro">
+      <label>Filtrar por Status</label>
+      <select>
+        <option>Todos</option>
+        <option>Pendente</option>
+        <option>Aprovado</option>
+        <option>Rejeitado</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Atividade</th>
+              <th>Categoria</th>
+              <th>Horas</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>João Silva</td>
+              <td>Curso de Python</td>
+              <td>Ensino</td>
+              <td>20h</td>
+              <td>2024-01-15</td>
+              <td><span class="badge">Pendente</span></td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-secondary">Ver Certificado</button>
+                  <button class="btn btn-primary">Aprovar</button>
+                  <button class="btn btn-secondary">Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Maria Santos</td>
+              <td>Palestra IA</td>
+              <td>Eventos</td>
+              <td>4h</td>
+              <td>2024-02-10</td>
+              <td><span class="badge">Pendente</span></td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-secondary">Ver Certificado</button>
+                  <button class="btn btn-primary">Aprovar</button>
+                  <button class="btn btn-secondary">Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>Pedro Costa</td>
+              <td>Hackathon</td>
+              <td>Eventos</td>
+              <td>8h</td>
+              <td>2024-02-15</td>
+              <td><span class="badge">Pendente</span></td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-secondary">Ver Certificado</button>
+                  <button class="btn btn-primary">Aprovar</button>
+                  <button class="btn btn-secondary">Rejeitar</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+</body>
+</html>
