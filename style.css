@@ -2,7 +2,7 @@
 
     body {
       font-family:  Arial, Helvetica, sans-serif;
-      background: #eef1f8;
+      background: #ffffff;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
@@ -13,7 +13,7 @@
 
     h1 {
       font-weight: 700;
-      color: #000000;
+      color: #163de7;
       margin-bottom: 10px;
     }
 
@@ -82,4 +82,71 @@
       
     }
 
+
    
+    .voltar {
+      position: absolute;
+      top: 30px;
+      left: 40px;
+      text-decoration: none;
+      color: #555;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 16px;
+      width: 420px;
+      text-align: center;
+     
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-weight: 600;
+      margin-bottom: 6px;
+      font-size: 0.9rem;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 0.95rem;
+    }
+
+    .esqueci {
+      display: block;
+      text-align: right;
+      color: #0d3888;
+      font-size: 0.85rem;
+      margin-bottom: 20px;
+      text-decoration: none;
+    }
+
+    button {
+      width: 100%;
+      padding: 14px;
+      background: #002ffff5;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover { background: #000; }
+
+.card {
+  background: rgb(255, 255, 255);
+  padding: 40px;
+  border-radius: 16px;
+  width: 100%;       
+  max-width: 420px;  
+  text-align: center;
+  
+}
+
