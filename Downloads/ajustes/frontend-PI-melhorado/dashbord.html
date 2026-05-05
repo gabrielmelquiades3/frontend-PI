@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard do Coordenador</title>
+  <link rel="stylesheet" href="global.css" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>Dashboard do Coordenador</h1>
+    <a href="index.html" id="btn-sair">Sair</a>
+  </div>
+
+  <div class="content">
+
+    <div class="alerta" id="alerta-pendentes">
+      Carregando dados...
+    </div>
+
+    <div class="metricas">
+      <div class="metrica"><span>Pendentes</span><strong id="m-pendentes">—</strong></div>
+      <div class="metrica"><span>Total Alunos</span><strong id="m-alunos">—</strong></div>
+      <div class="metrica"><span>Cursos Ativos</span><strong id="m-cursos">—</strong></div>
+      <div class="metrica"><span>Taxa Aprovação</span><strong id="m-taxa">—</strong></div>
+    </div>
+
+    <div class="card">
+      <h2>Ações Rápidas</h2>
+      <div class="btn-group">
+        <a href="solicitacoes.html" class="btn btn-primary">Ver Solicitações</a>
+        <a href="alunos.html"       class="btn btn-primary">Cadastrar Alunos</a>
+        <a href="cursos.html"       class="btn btn-primary">Gerenciar Cursos</a>
+      </div>
+    </div>
+
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    async function carregarMetricas() {
+      try {
+        const dados = await dashboard.metricas();
+        document.getElementById('m-pendentes').textContent = dados.pendentes;
+        document.getElementById('m-alunos').textContent = dados.totalAlunos;
+        document.getElementById('m-cursos').textContent = dados.cursosAtivos;
+        document.getElementById('m-taxa').textContent = dados.taxaAprovacao + '%';
+
+        const alerta = document.getElementById('alerta-pendentes');
+        if (dados.pendentes > 0) {
+          alerta.textContent = `Você tem ${dados.pendentes} solicitação(ões) pendente(s) de análise!`;
+          alerta.style.borderLeft = '4px solid #d97706';
+        } else {
+          alerta.textContent = 'Nenhuma solicitação pendente no momento.';
+          alerta.style.borderLeft = '4px solid #16a34a';
+        }
+      } catch (err) {
+        document.getElementById('alerta-pendentes').textContent = 'Não foi possível carregar os dados. Verifique se o backend está rodando.';
+        console.error('Erro ao carregar métricas:', err);
+      }
+    }
+
+    carregarMetricas();
+  </script>
+
+</body>
+</html>

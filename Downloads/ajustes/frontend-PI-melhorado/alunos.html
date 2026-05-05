@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Alunos</title>
+  <link rel="stylesheet" href="global.css" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>Cadastro de Alunos</h1>
+    <a href="dashbord.html">Voltar</a>
+  </div>
+
+  <div class="content">
+
+    <div class="card">
+      <h2>Novo Aluno</h2>
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome Completo</label>
+          <input type="text" id="nome" placeholder="Ex: João Silva" />
+        </div>
+        <div class="form-group">
+          <label>E-mail Institucional</label>
+          <input type="email" id="email" placeholder="aluno@email.com" />
+        </div>
+        <div class="form-group">
+          <label>Matrícula</label>
+          <input type="text" id="matricula" placeholder="Ex: 20241001" />
+        </div>
+        <div class="form-group">
+          <label>Curso</label>
+          <select id="idCurso">
+            <option value="">Selecione o curso</option>
+          </select>
+        </div>
+      </div>
+      <p id="msg-aluno" style="margin-bottom:10px; font-size:0.9rem;"></p>
+      <button class="btn btn-primary" id="btn-cadastrar">Cadastrar Aluno</button>
+    </div>
+
+    <div class="card">
+      <h2>Alunos Cadastrados</h2>
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>E-mail</th>
+              <th>Matrícula</th>
+              <th>Curso</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-alunos">
+            <tr><td colspan="5" style="text-align:center; color:#888;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Modal de edição -->
+  <div class="modal-overlay" id="modal-editar">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Editar Aluno</h2>
+        <button class="modal-fechar" onclick="fecharModalEditar()">×</button>
+      </div>
+      <div class="form-grid" style="margin-top:10px;">
+        <div class="form-group">
+          <label>Nome</label>
+          <input type="text" id="edit-nome" />
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="edit-email" />
+        </div>
+        <div class="form-group">
+          <label>Matrícula</label>
+          <input type="text" id="edit-matricula" />
+        </div>
+        <div class="form-group">
+          <label>Curso</label>
+          <select id="edit-curso"></select>
+        </div>
+      </div>
+      <input type="hidden" id="edit-id" />
+      <p id="msg-edit" style="font-size:0.9rem; margin-bottom:8px;"></p>
+      <button class="btn btn-primary" style="width:100%" onclick="salvarEdicao()">Salvar Alterações</button>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    let listaCursos = [];
+
+    async function carregarCursos() {
+      try {
+        listaCursos = await cursos.listar();
+        const selects = ['idCurso', 'edit-curso'];
+        selects.forEach(id => {
+          const sel = document.getElementById(id);
+          if (!sel) return;
+          // Mantém a primeira option
+          const base = sel.options[0] ? sel.options[0].outerHTML : '';
+          sel.innerHTML = base;
+          listaCursos.forEach(c => {
+            sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+          });
+        });
+      } catch (err) {
+        console.error('Erro ao carregar cursos:', err);
+      }
+    }
+
+    async function carregarAlunos() {
+      const tbody = document.getElementById('tabela-alunos');
+      try {
+        const lista = await alunos.listar();
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Nenhum aluno cadastrado.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = lista.map(a => `
+          <tr>
+            <td>${a.nome}</td>
+            <td>${a.email}</td>
+            <td>${a.matricula}</td>
+            <td>${a.curso || '—'}</td>
+            <td>
+              <div class="btn-group">
+                <button class="btn btn-primary" onclick="abrirEdicao(${a.id}, '${a.nome}', '${a.email}', '${a.matricula}', ${a.idCurso})">Editar</button>
+                <button class="btn btn-secondary" onclick="excluirAluno(${a.id})">Excluir</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:red;">Erro ao carregar alunos.</td></tr>';
+      }
+    }
+
+    document.getElementById('btn-cadastrar').addEventListener('click', async function() {
+      const msg = document.getElementById('msg-aluno');
+      const dados = {
+        nome:     document.getElementById('nome').value.trim(),
+        email:    document.getElementById('email').value.trim(),
+        matricula:document.getElementById('matricula').value.trim(),
+        idCurso:  parseInt(document.getElementById('idCurso').value)
+      };
+
+      if (!dados.nome || !dados.email || !dados.matricula || !dados.idCurso) {
+        msg.textContent = 'Preencha todos os campos.';
+        msg.style.color = 'red';
+        return;
+      }
+
+      this.textContent = 'Cadastrando...';
+      this.disabled = true;
+      try {
+        await alunos.criar(dados);
+        msg.textContent = 'Aluno cadastrado com sucesso!';
+        msg.style.color = 'green';
+        document.getElementById('nome').value = '';
+        document.getElementById('email').value = '';
+        document.getElementById('matricula').value = '';
+        document.getElementById('idCurso').value = '';
+        carregarAlunos();
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.style.color = 'red';
+      }
+      this.textContent = 'Cadastrar Aluno';
+      this.disabled = false;
+    });
+
+    function abrirEdicao(id, nome, email, matricula, idCurso) {
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-nome').value = nome;
+      document.getElementById('edit-email').value = email;
+      document.getElementById('edit-matricula').value = matricula;
+      document.getElementById('edit-curso').value = idCurso;
+      document.getElementById('msg-edit').textContent = '';
+      document.getElementById('modal-editar').classList.add('aberto');
+    }
+
+    function fecharModalEditar() {
+      document.getElementById('modal-editar').classList.remove('aberto');
+    }
+
+    async function salvarEdicao() {
+      const id = document.getElementById('edit-id').value;
+      const msg = document.getElementById('msg-edit');
+      const dados = {
+        nome:     document.getElementById('edit-nome').value.trim(),
+        email:    document.getElementById('edit-email').value.trim(),
+        matricula:document.getElementById('edit-matricula').value.trim(),
+        idCurso:  parseInt(document.getElementById('edit-curso').value)
+      };
+
+      try {
+        await alunos.editar(id, dados);
+        msg.textContent = 'Atualizado!';
+        msg.style.color = 'green';
+        fecharModalEditar();
+        carregarAlunos();
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.style.color = 'red';
+      }
+    }
+
+    async function excluirAluno(id) {
+      if (!confirm('Excluir este aluno?')) return;
+      try {
+        await alunos.excluir(id);
+        carregarAlunos();
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      }
+    }
+
+    carregarCursos();
+    carregarAlunos();
+  </script>
+
+</body>
+</html>

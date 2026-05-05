@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Área Administrativa</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <a class="voltar" href="index.html">← Voltar</a>
+
+    <div class="card">
+   
+    <h1>Área Administrativa</h1>
+    <p>Acesso restrito para coordenadores</p>
+
+    <label>E-mail Institucional</label>
+    <input type="email" id="email" placeholder="coordenador@.edu.br" />
+
+    <label>Senha</label>
+    <input type="password" id="senha" placeholder="••••••••••" />
+
+    <p id="msg-erro" style="color: red; font-size: 0.85rem; margin-bottom: 10px; display: none;"></p>
+
+    <a style="text-align: center;" class="esqueci">Esqueci minha senha</a>
+
+    <button id="btn-login">Acessar Dashboard</button>
+    </div>
+
+  <script src="api.js"></script>
+  <script>
+    document.getElementById('btn-login').addEventListener('click', async function() {
+      const email = document.getElementById('email').value.trim();
+      const senha = document.getElementById('senha').value;
+      const msgErro = document.getElementById('msg-erro');
+
+      if (!email || !senha) {
+        msgErro.textContent = 'Preencha e-mail e senha.';
+        msgErro.style.display = 'block';
+        return;
+      }
+
+      this.textContent = 'Entrando...';
+      this.disabled = true;
+      msgErro.style.display = 'none';
+
+      try {
+        const usuario = await auth.login(email, senha);
+        // Salva dados do usuário para uso nas outras páginas
+        sessionStorage.setItem('usuario', JSON.stringify(usuario));
+        window.location.href = 'dashbord.html';
+      } catch (err) {
+        msgErro.textContent = err.message || 'E-mail ou senha incorretos.';
+        msgErro.style.display = 'block';
+        this.textContent = 'Acessar Dashboard';
+        this.disabled = false;
+      }
+    });
+
+    document.getElementById('senha').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') document.getElementById('btn-login').click();
+    });
+  </script>
+</body>
+</html>

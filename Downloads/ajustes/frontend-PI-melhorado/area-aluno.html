@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="global.css">
+    <title>Minha Área - Aluno</title>
+</head>
+<body>
+    <div class="container">
+        <h1>Painel do Aluno</h1>
+        <a href="index.html" style="text-decoration: none; color: #666;">← Voltar ao Início</a>
+
+        
+        <div class="card" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;">
+            <h3>Identificação</h3>
+            <div style="display:flex; gap:10px; align-items:flex-end; margin-top:10px;">
+              <div style="flex:1;">
+                <label style="font-size:13px;font-weight:600;">Selecione seu nome</label>
+                <select id="sel-aluno" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;margin-top:4px;">
+                  <option value="">Carregando alunos...</option>
+                </select>
+              </div>
+              <button class="btn btn-primary" onclick="carregarMinhasAtividades()" style="white-space:nowrap;">Carregar</button>
+            </div>
+        </div>
+
+        
+        <div class="card" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;">
+            <h3>Submeter Nova Atividade</h3>
+            <div style="display: flex; flex-direction: column; gap: 15px; margin-top:10px;">
+                <input type="text" id="titulo" placeholder="Título da Atividade (ex: Palestra de Inovação)" required>
+                
+                <div style="display: flex; gap: 10px;">
+                    <input type="number" id="cargaHoraria" placeholder="Carga Horária" style="flex: 1;" min="1">
+                    <select id="idCategoria" style="flex: 1; padding:12px; border:1px solid #ddd; border-radius:8px;">
+                        <option value="">Selecione a Categoria</option>
+                    </select>
+                </div>
+
+                <textarea id="descricao" placeholder="Breve descrição da atividade" rows="3"
+                  style="padding:12px;border:1px solid #ddd;border-radius:8px;font-size:0.95rem;"></textarea>
+
+                <p id="msg-envio" style="font-size:0.9rem;"></p>
+                <button id="btn-enviar" class="btn btn-primary" onclick="enviarSolicitacao()">
+                    Enviar para Avaliação
+                </button>
+            </div>
+        </div>
+
+        
+        <div class="card" style="margin-top: 20px; padding: 20px; border: 1px solid #ccc;">
+            <h3>Minhas Atividades Submetidas</h3>
+            <div class="tabela-wrap" style="margin-top:10px;">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Título</th>
+                    <th>Horas</th>
+                    <th>Data Envio</th>
+                    <th>Status</th>
+                    <th>Observação</th>
+                  </tr>
+                </thead>
+                <tbody id="tabela-minhas">
+                  <tr><td colspan="5" style="text-align:center;color:#888;">Selecione seu nome acima.</td></tr>
+                </tbody>
+              </table>
+            </div>
+        </div>
+    </div>
+
+  <script src="api.js"></script>
+  <script>
+    async function inicializar() {
+      
+      try {
+        const lista = await alunos.listar();
+        const sel = document.getElementById('sel-aluno');
+        sel.innerHTML = '<option value="">Selecione seu nome</option>';
+        lista.forEach(a => {
+          sel.innerHTML += `<option value="${a.id}" data-curso="${a.idCurso}">${a.nome}</option>`;
+        });
+      } catch (err) {
+        console.error('Erro ao carregar alunos:', err);
+      }
+
+      
+      try {
+        const lista = await categorias.listar();
+        const sel = document.getElementById('idCategoria');
+        lista.forEach(c => {
+          sel.innerHTML += `<option value="${c.id}">${c.nome}</option>`;
+        });
+      } catch (err) {
+        console.error('Erro ao carregar categorias:', err);
+      }
+    }
+
+    async function carregarMinhasAtividades() {
+      const sel = document.getElementById('sel-aluno');
+      const idAluno = sel.value;
+      if (!idAluno) return;
+
+      const tbody = document.getElementById('tabela-minhas');
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+      try {
+        const lista = await solicitacoes.listarPorAluno(idAluno);
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#888;">Nenhuma atividade enviada ainda.</td></tr>';
+          return;
+        }
+        const cores = {
+          pendente: 'color:#92400e;',
+          aprovado: 'color:#065f46;',
+          rejeitado:'color:#991b1b;'
+        };
+        tbody.innerHTML = lista.map(a => {
+          const cor = cores[(a.status || '').toLowerCase()] || '';
+          return `
+            <tr>
+              <td>${a.atividade}</td>
+              <td>${a.horas}h</td>
+              <td>${a.data || '—'}</td>
+              <td style="font-weight:bold;${cor}">${a.status}</td>
+              <td>${a.observacao || '—'}</td>
+            </tr>`;
+        }).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:red;">${err.message}</td></tr>`;
+      }
+    }
+
+    async function enviarSolicitacao() {
+      const msg = document.getElementById('msg-envio');
+      const sel = document.getElementById('sel-aluno');
+      const idAluno = sel.value;
+      const opt = sel.options[sel.selectedIndex];
+      const idCurso = opt ? parseInt(opt.getAttribute('data-curso')) : null;
+
+      const dados = {
+        titulo:       document.getElementById('titulo').value.trim(),
+        descricao:    document.getElementById('descricao').value.trim(),
+        cargaHoraria: parseInt(document.getElementById('cargaHoraria').value),
+        idAluno:      parseInt(idAluno),
+        idCurso:      idCurso,
+        idCategoria:  parseInt(document.getElementById('idCategoria').value)
+      };
+
+      if (!dados.idAluno) {
+        msg.textContent = 'Selecione seu nome primeiro.';
+        msg.style.color = 'red';
+        return;
+      }
+      if (!dados.titulo || !dados.cargaHoraria || !dados.idCategoria || !dados.idCurso) {
+        msg.textContent = 'Preencha todos os campos obrigatórios.';
+        msg.style.color = 'red';
+        return;
+      }
+
+      const btn = document.getElementById('btn-enviar');
+      btn.textContent = 'Enviando...';
+      btn.disabled = true;
+
+      try {
+        await solicitacoes.criar(dados);
+        msg.textContent = 'Atividade enviada com sucesso! Aguarde a análise.';
+        msg.style.color = 'green';
+        document.getElementById('titulo').value = '';
+        document.getElementById('cargaHoraria').value = '';
+        document.getElementById('descricao').value = '';
+        document.getElementById('idCategoria').value = '';
+        carregarMinhasAtividades();
+      } catch (err) {
+        msg.textContent = 'Erro: ' + err.message;
+        msg.style.color = 'red';
+      }
+
+      btn.textContent = 'Enviar para Avaliação';
+      btn.disabled = false;
+    }
+
+    inicializar();
+  </script>
+</body>
+</html>

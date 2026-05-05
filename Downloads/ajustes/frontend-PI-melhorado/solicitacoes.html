@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Solicitações de Atividades</title>
+  <link rel="stylesheet" href="global.css" />
+</head>
+<body>
+
+  <div class="header">
+    <h1>Solicitações de Atividades</h1>
+    <a href="dashbord.html">Voltar</a>
+  </div>
+
+  <div class="content">
+
+    <div class="filtro">
+      <div>Filtrar por Status:</div>
+      <select id="filtro-status">
+        <option value="">Todos</option>
+        <option value="pendente">Pendente</option>
+        <option value="aprovado">Aprovado</option>
+        <option value="rejeitado">Rejeitado</option>
+      </select>
+    </div>
+
+    <div class="card">
+      <div class="tabela-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Aluno</th>
+              <th>Atividade</th>
+              <th>Categoria</th>
+              <th>Horas</th>
+              <th>Data</th>
+              <th>Status</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
+          <tbody id="tabela-solicitacoes">
+            <tr><td colspan="7" style="text-align:center;color:#888;">Carregando...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+
+
+  <div class="modal-overlay" id="modal-rejeitar">
+    <div class="modal">
+      <div class="modal-header">
+        <h2>Rejeitar Solicitação</h2>
+        <button class="modal-fechar" onclick="fecharModalRejeitar()">×</button>
+      </div>
+      <div class="form-group" style="margin-bottom:16px;">
+        <label>Observação (opcional)</label>
+        <textarea id="obs-rejeitar" rows="3" style="width:100%;padding:10px;border:1px solid #ddd;border-radius:8px;font-size:14px;" placeholder="Motivo da rejeição..."></textarea>
+      </div>
+      <input type="hidden" id="id-rejeitar" />
+      <button class="btn btn-secondary" style="width:100%" onclick="confirmarRejeitar()">Confirmar Rejeição</button>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    function badgeStatus(status) {
+      const cores = {
+        pendente: 'color:#92400e;background:#fef3c7;border-color:#fde68a;',
+        aprovado: 'color:#065f46;background:#d1fae5;border-color:#6ee7b7;',
+        rejeitado:'color:#991b1b;background:#fee2e2;border-color:#fca5a5;'
+      };
+      const s = (status || '').toLowerCase();
+      const estilo = cores[s] || '';
+      return `<span class="badge" style="${estilo}">${status}</span>`;
+    }
+
+    async function carregarSolicitacoes() {
+      const status = document.getElementById('filtro-status').value;
+      const tbody = document.getElementById('tabela-solicitacoes');
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;">Carregando...</td></tr>';
+
+      try {
+        const lista = await solicitacoes.listar(status);
+        if (lista.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#888;">Nenhuma solicitação encontrada.</td></tr>';
+          return;
+        }
+        tbody.innerHTML = lista.map(s => `
+          <tr>
+            <td>${s.aluno}</td>
+            <td>${s.atividade}</td>
+            <td>${s.categoria}</td>
+            <td>${s.horas}h</td>
+            <td>${s.data || '—'}</td>
+            <td>${badgeStatus(s.status)}</td>
+            <td>
+              <div class="btn-group">
+                ${s.status.toLowerCase() === 'pendente' ? `
+                  <button class="btn btn-primary" onclick="aprovar(${s.id})">Aprovar</button>
+                  <button class="btn btn-secondary" onclick="abrirRejeitar(${s.id})">Rejeitar</button>
+                ` : `<span style="color:#888;font-size:13px;">${s.observacao ? s.observacao : 'Concluído'}</span>`}
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:red;">${err.message}</td></tr>`;
+      }
+    }
+
+    async function aprovar(id) {
+      if (!confirm('Aprovar esta solicitação?')) return;
+      try {
+        await solicitacoes.aprovar(id);
+        carregarSolicitacoes();
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      }
+    }
+
+    function abrirRejeitar(id) {
+      document.getElementById('id-rejeitar').value = id;
+      document.getElementById('obs-rejeitar').value = '';
+      document.getElementById('modal-rejeitar').classList.add('aberto');
+    }
+
+    function fecharModalRejeitar() {
+      document.getElementById('modal-rejeitar').classList.remove('aberto');
+    }
+
+    async function confirmarRejeitar() {
+      const id = document.getElementById('id-rejeitar').value;
+      const obs = document.getElementById('obs-rejeitar').value.trim();
+      try {
+        await solicitacoes.rejeitar(id, obs);
+        fecharModalRejeitar();
+        carregarSolicitacoes();
+      } catch (err) {
+        alert('Erro: ' + err.message);
+      }
+    }
+
+    document.getElementById('filtro-status').addEventListener('change', carregarSolicitacoes);
+    carregarSolicitacoes();
+  </script>
+</body>
+</html>
