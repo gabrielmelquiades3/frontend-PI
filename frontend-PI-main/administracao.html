@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="global.css">
+    <title>Painel Administrativo</title>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Painel Administrativo</h1>
+            <a href="index.html" style="text-decoration: none; color: #555; font-weight: bold;">← Voltar ao Início</a>
+        </header>
+
+        <main style="margin-top: 20px;">
+            
+            <section class="card" style="margin-bottom: 30px; border: 1px solid #ddd; padding: 20px; border-radius: 8px;">
+                <h3>Cadastrar Novo Coordenador</h3>
+                <form style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <input type="text" placeholder="Nome do Coordenador" required>
+                    <input type="email" placeholder="E-mail Institucional" required>
+                    <input type="password" placeholder="Senha de Acesso" required>
+                    <select required>
+                        <option value="">Vincular ao Curso</option>
+                        <option value="1">Sistemas para Internet</option>
+                        <option value="2">Logística</option>
+                        <option value="3">Gestão Comercial</option>
+                    </select>
+                    <button type="button" onclick="alert('Coordenador cadastrado no sistema!')" 
+                            style="grid-column: span 2; background-color: #28a745; color: white; border: none; padding: 12px; cursor: pointer; border-radius: 4px; font-weight: bold;">
+                        Confirmar Cadastro
+                    </button>
+                </form>
+            </section>
+
+            
+            <div class="quadrados" style="display: flex; gap: 20px; flex-wrap: wrap; justify-content: center;">
+                
+                <div class="quadrado" style="flex: 1; min-width: 220px;">
+                    <div class="quadrado-header"><span class="quadrado-title">Gestão de Alunos</span></div>
+                    <p class="quadrado-texto">Visualize e edite os dados de todos os alunos matriculados[cite: 4].</p>
+                    <a class="quadrado-link" href="alunos.html">Abrir Lista</a>
+                </div>
+
+                <div class="quadrado" style="flex: 1; min-width: 220px;">
+                    <div class="quadrado-header"><span class="quadrado-title">Configurar Cursos</span></div>
+                    <p class="quadrado-texto">Gerencie a carga horária e as diretrizes de cada curso[cite: 4].</p>
+                    <a class="quadrado-link" href="cursos.html">Configurar</a>
+                </div>
+
+                <div class="quadrado" style="flex: 1; min-width: 220px;">
+                    <div class="quadrado-header"><span class="quadrado-title">Estatísticas</span></div>
+                    <p class="quadrado-texto">Veja o balanço geral de horas e atividades do semestre[cite: 4].</p>
+                    <a class="quadrado-link" href="dashbord.html">Ver Dashboard</a>
+                </div>
+
+            </div>
+        </main>
+    </div>
+</body>
+</html>
